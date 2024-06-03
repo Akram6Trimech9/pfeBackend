@@ -1,0 +1,22 @@
+const express = require('express');
+const router = express.Router();
+const documentsController = require('../controller/documentController');
+const multer = require('multer');
+
+ const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/'); 
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+const upload = multer({ storage: storage });
+
+ router.post('/', upload.array('files', 5), documentsController.createDocument);
+router.get('/', documentsController.getAllDocuments);
+router.get('/:id', documentsController.getDocumentById);
+router.patch('/:id', documentsController.updateDocument);
+router.delete('/:id', documentsController.deleteDocument);
+
+module.exports = router;
