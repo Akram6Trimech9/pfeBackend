@@ -16,10 +16,10 @@ const mongoose = require('mongoose');
         type: String,
         required: true
     },
-    files: [{ 
+    file: { 
         type: String,
         required: true
-    }]
+    }
 });
 
 module.exports = mongoose.model('Documents', documentSchema);

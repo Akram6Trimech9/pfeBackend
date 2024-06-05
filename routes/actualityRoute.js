@@ -16,5 +16,6 @@ const upload = multer({ storage: storage });
 
  router.post('/', upload.single('file'), actualityController.createActuality);
 router.get('/', actualityController.getAllActualities);
+router.get('/:id', actualityController.getOne);
 
 module.exports = router;

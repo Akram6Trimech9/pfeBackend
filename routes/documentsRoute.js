@@ -13,7 +13,7 @@ const multer = require('multer');
 });
 const upload = multer({ storage: storage });
 
- router.post('/', upload.array('files', 5), documentsController.createDocument);
+ router.post('/', upload.single('file'), documentsController.createDocument);
 router.get('/', documentsController.getAllDocuments);
 router.get('/:id', documentsController.getDocumentById);
 router.patch('/:id', documentsController.updateDocument);

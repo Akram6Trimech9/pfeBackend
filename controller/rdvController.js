@@ -1,7 +1,7 @@
 const Rdv = require('../models/rdv');
 const user = require('../models/user')
 const asyncHandler = require('express-async-handler');
-const socket = require('socket.io-client')("localhost:3000");
+const socket = require('socket.io-client')("http://localhost:3000/");
 const Notification = require('../models/notifications')
 const mongoose = require('mongoose');
 
@@ -15,31 +15,27 @@ const createRdv = asyncHandler(async (req, res) => {
     );
     rdv.user = updateUser._id;  
     await rdv.save();  
-    const admin = await user.findOne({$where:{isAdmin:true}})
+    const admin = await user.findOne({ email: 'addmin@yahoo.com' });
     const notification = new Notification({
         message: "Le rendez-vous created",
         user: admin._id
     });
 
-    
-    notification.save().then(notification_created => {
+    try {
+        const notification_created = await notification.save();
         if(notification_created){
-            console.log(notification_created, "created");
-            socket.emit('rdv-created', {clientId: admin._id, notification: notification_created});
+         await  socket.emit('rdv-created', {clientId: admin._id, notification: notification_created});
         }
-        else {
-            return res.status(400).json({ message: 'rdv created failed' });
-        }            
-    }).catch(err => {
+    } catch (err) {
         return res.status(400).json({ message: 'Error creating notification' });
-    });
+    }
+    
     if (updateUser && rdv) {
         res.status(201).json(rdv);
     } else {
         res.status(500).json({ message: "Failed to create rdv or update user" });
     }
 });
-
 const getAllRdvs = asyncHandler(async (req, res) => {
     const rdvs = await Rdv.find().populate('user');
     res.json(rdvs);
@@ -71,6 +67,17 @@ const getAllRdvs = asyncHandler(async (req, res) => {
     }
     res.json(rdv);
 });
+
+const getRdvByUser = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+    const rdvs = await Rdv.find({ user: id }).populate('user');
+    if (!rdvs || rdvs.length === 0) {
+        res.status(404);
+        throw new Error('Appointments not found for the user');
+    }
+    res.json(rdvs);
+});
+
 
 const acceptRdv = asyncHandler(async (req, res) => {
     const { id } = req.params;
@@ -122,5 +129,6 @@ module.exports = {
     updateRdv,
     deleteRdv,
     acceptRdv,
-    refuseRdv
+    refuseRdv,
+    getRdvByUser
 };

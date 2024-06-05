@@ -27,7 +27,21 @@ const getAllActualities = async (req, res) => {
   }
 };
 
+const  getOne = async(req,res)=>{
+  try{
+  const id = req.params.id
+  const actuality = await Actuality.findById(id)
+  if(!actuality){ 
+    res.status(404).json({message :'actuality not found '})
+  }
+  res.json(  actuality );
+  }catch(err){
+    res.status(500).json({ error: err.message });
+  }
+}
+
 module.exports = {
   createActuality,
   getAllActualities,
+  getOne
 };

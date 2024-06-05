@@ -2,15 +2,19 @@ const Documents = require('../models/documents');
 
 exports.createDocument = async (req, res) => {
     try {
-        const { title, category, description } = req.body;
-        const files = req.files ? req.files.map(file => file.path) : []; 
-        const document = new Documents({ title, category, description, files });
-        await document.save();
-        res.status(201).json(document);
+        const { filename, path, mimetype, size } = req.file;
+  
+       const document = await Documents.create({
+        title: req.body.title,
+        category: req.body.category, 
+        description: req.body.description,
+        file: path,  
+       });
+      res.status(201).json({ document });
     } catch (err) {
-        res.status(400).json({ message: err.message });
+      res.status(400).json({ error: err.message });
     }
-};
+  };
 
  exports.getAllDocuments = async (req, res) => {
     try {
