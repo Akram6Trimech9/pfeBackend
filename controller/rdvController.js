@@ -4,6 +4,7 @@ const asyncHandler = require('express-async-handler');
 const socket = require('socket.io-client')("http://localhost:3000/");
 const Notification = require('../models/notifications')
 const mongoose = require('mongoose');
+const { sendEmailWithAttachments } = require('../services/emailService');
 
 const createRdv = asyncHandler(async (req, res) => {
     const { idUser } = req.params;
@@ -86,10 +87,12 @@ const acceptRdv = asyncHandler(async (req, res) => {
       { status: 'accepted' },
       { new: true }
     ).populate('user');
-    if (!rdv) {
+     if (!rdv) {
       res.status(404);
       throw new Error('Rdv not found');
     }
+    const path = "templates/rdv-created.html" ;
+     await sendEmailWithAttachments(rdv.user.email ,'akramtrimech97@gmail.com','Rendez vous Accepted ', path ,null,"resetURL" )
     const notification = new Notification({
         message: "Le rendez-vous a été confirmé",
         user: rdv.user._id
@@ -105,6 +108,7 @@ const acceptRdv = asyncHandler(async (req, res) => {
     }).catch(err => {
         return res.status(400).json({ message: 'Error creating notification' });
     });
+    
     res.json(rdv);
 });
 

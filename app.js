@@ -29,11 +29,12 @@ const categoryActualityRouter = require('./routes/categoryRoute');
 const documentRouter = require('./routes/documentsRoute');
 const notificationRouter = require('./routes/notificationRoute');
 const actualityRoute = require('./routes/actualityRoute');
-
+const messageRoute = require('./routes/messageRoute')
 app.use('/api/user', authRouter);
 app.use('/api/rdv', rdvRouter);
 app.use('/api/actuality', actualityRoute);
 app.use('/api/contacts', contactRouter);
+app.use('/api/message',messageRoute );
 app.use('/api/category-actualty', categoryActualityRouter);
 app.use('/api/documents', documentRouter);
 app.use('/api/notifications', notificationRouter);

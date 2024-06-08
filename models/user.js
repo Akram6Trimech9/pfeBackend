@@ -40,7 +40,7 @@ var userSchema = new mongoose.Schema({
     }, 
     isBlocked:{
          type:Boolean ,
-         default :false 
+         default :true 
     },
     Notifications:[  {
         type: mongoose.Schema.Types.ObjectId,
@@ -57,7 +57,8 @@ var userSchema = new mongoose.Schema({
     },
     passwordChangeAt : Date  , 
     passwordResetToken : String , 
-    passwordResetExpires: Date
+    passwordResetExpires: Date,
+    verificationToken:String
 },{
     timestamps:true
 });

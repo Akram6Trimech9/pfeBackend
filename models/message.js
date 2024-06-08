@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
  
-var notifSchema = new mongoose.Schema({
+var messageSchema = new mongoose.Schema({
     message :{ 
         type:String,
         required:true
@@ -9,5 +9,9 @@ var notifSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
       }, 
+      email:{
+        type:String,
+        required:false
+      }
 })
-module.exports = mongoose.model('Notifications', notifSchema);
+module.exports = mongoose.model('Message', messageSchema);

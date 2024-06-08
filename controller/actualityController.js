@@ -40,8 +40,25 @@ const  getOne = async(req,res)=>{
   }
 }
 
+const deleteActuality = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const actuality = await Actuality.findByIdAndDelete(id);
+    
+    if (!actuality) {
+      return res.status(404).json({ message: 'Actuality not found' });
+    }
+
+    res.json({ message: 'Actuality deleted successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 module.exports = {
   createActuality,
   getAllActualities,
-  getOne
+  getOne,
+  deleteActuality
 };

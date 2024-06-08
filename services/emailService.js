@@ -28,8 +28,8 @@ const fs = require('fs');
     const html = htmlTemplate.replace('{{tokenLink}}', resetURL);
     const mailOptions = {
       from: 'akramtrimech97@gmail.com',
-      to: Array.isArray(to) ? to.join(', ') : to,
-      cc: Array.isArray(cc) ? cc.join(', ') : cc,
+      to: to,
+      cc:cc,
       subject,
       html,
       attachments 

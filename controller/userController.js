@@ -10,15 +10,29 @@ const jwt = require('jsonwebtoken')
 const { json } = require('body-parser')
 
  const createUser =asyncHandler( async (req, res) => {
-      const email = req.body.email;
-      const findUser = await User.findOne({ email: email });
-       if(!findUser){ 
-          const newUser =  await User.create(req.body)
-           res.status(201).json(newUser);
-       }else{ 
-        throw new Error('user already exists')   
-    }
-
+    //   const email = req.body.email;
+    //   const findUser = await User.findOne({ email: email });
+    //    if(findUser){ 
+    //     const verificationToken = crypto.randomBytes(32).toString("hex");
+    //     findUser.verificationToken = verificationToken;
+    //       const newUser =  await User.create(findUser)
+    //        res.status(201).json(newUser);
+    //    }else{ 
+    //     throw new Error('user already exists')   
+    // }
+    const email = req.body.email;
+    const findUser = await User.findOne({ email: email });
+     if(findUser){ 
+      throw new Error('user already exists') 
+     }else{
+      const verificationToken = crypto.randomBytes(32).toString("hex");
+       const user = new User({ 
+         ...req.body , 
+         verificationToken: verificationToken
+       }) ;
+            const newUser =  await User.create(user)
+               res.status(201).json(newUser);
+     }
   }
 )
 
@@ -43,6 +57,7 @@ const { json } = require('body-parser')
          firstname : isUser?.firstName , 
          lastname : isUser?.lastName , 
          token:generateToken( isUser?._id) , 
+         isBlocked: isUser?.isBlocked
 
        });
     }else{
@@ -192,10 +207,35 @@ const blockUser = asyncHandler(async (req,res)=>{
    }
 } )
 
+
+const sendVerificationLink = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  try {
+      const user = await User.findById(id);
+      if (!user) {
+          throw new Error('User not found');
+      }
+      
+      let verificationToken = user.verificationToken;
+      if (!verificationToken) {
+           verificationToken = crypto.randomBytes(32).toString("hex");
+          user.verificationToken = verificationToken;
+          await user.save();
+      }
+
+      const path = "templates/validate-account.html";
+      const resetURL = `${process.env.VERIFICATION_LINK}/${verificationToken}`;
+      await sendEmailWithAttachments(user.email, 'akramtrimech97@gmail.com', 'Verification Link', path, null, resetURL);
+      
+      res.json({ message: 'Verification link sent successfully' });
+  } catch (error) {
+      res.status(500).json({ error: error.message });
+  }
+});
+
 const unBlockUser = asyncHandler(async (req,res)=>{
   const { id } = req.params 
   validateMongoDbId(id)
-
  try{
     const block = await User.findOneAndUpdate({_id : id } ,{ 
      isBlocked : false 
@@ -261,10 +301,10 @@ const deleteUser = asyncHandler(async ( req , res )=> {
 })
 
 const updatePassword = asyncHandler(async (req,res )=> {
-   const {_id} = req.user ; 
+   const {id} = req.params ; 
    const password = req.body.password;
-    validateMongoDbId(_id); 
-   const user = await User.findById(_id)
+    validateMongoDbId(id); 
+   const user = await User.findById(id)
    if(password){ 
     user.password = password;
     const updatePassword = await user.save();
@@ -284,7 +324,8 @@ const updatePassword = asyncHandler(async (req,res )=> {
    await user.save()
    const path = "templates/reset-password.html" ;
    const  resetURL= `${process.env.RESET_LINK}${token}`
-   sendEmailWithAttachments(email ,'akramtrimech97@gmail.com','reset password link ', path ,null,resetURL )
+   console.log(email)
+   await sendEmailWithAttachments(email ,'akramtrimech97@gmail.com','reset password link ', path ,null,resetURL )
   res.json(token) 
   }catch(error){ 
        throw new Error(error)
@@ -295,6 +336,7 @@ const updatePassword = asyncHandler(async (req,res )=> {
    const resetPassword = asyncHandler(async (req,res )=> { 
     try{  
     const {password } = req.body
+    console.log(password)
      const {token} = req.params ; 
      const hashedToken= crypto.createHash("sha256").update(token).digest("hex")
      const user = await User.findOne({ 
@@ -313,5 +355,26 @@ const updatePassword = asyncHandler(async (req,res )=> {
   }
    )
    
+   const verifiedAccount=async(req,res)=>{ 
+     const {token} = req.params
+      try { 
+          const user = await  User.findOne({verificationToken: token })
+          const updatedIsBlocked  = await User.findOneAndUpdate(user._id ,{$set:{
+            isBlocked: false
+          }} )
+          console.log(user)
+          if(user){
+             res.status(201).json({
+               verified : true 
+             })
+          }else{ 
+             res.status(404).json({
+               message: 'user not  found '
+             })
+          }
+      }catch(error){ 
+         res.status(500).json(error)
+      }
+   }
 
-module.exports = {  loginAdmin , resetPassword , forgotPasswordToken ,  updatePassword , logout ,  handleRefreshToken , createUser, login , getAllUsers , getOneUser , deleteUser , updateUser ,blockUser , unBlockUser } ;
+module.exports = { verifiedAccount , sendVerificationLink, loginAdmin , resetPassword , forgotPasswordToken ,  updatePassword , logout ,  handleRefreshToken , createUser, login , getAllUsers , getOneUser , deleteUser , updateUser ,blockUser , unBlockUser } ;
