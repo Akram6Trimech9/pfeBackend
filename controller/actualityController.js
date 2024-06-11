@@ -54,11 +54,42 @@ const deleteActuality = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+ const updateActuality = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const actuality = await Actuality.findById(id);
 
+    if (!actuality) {
+      return res.status(404).json({ message: 'actuality not found' });
+    }
+
+    if (req.body.title != null) {
+      actuality.title = req.body.title;
+    }
+    if (req.body.subtitle != null) {
+      actuality.subtitle = req.body.subtitle;
+    }
+    if (req.body.category != null) {
+      actuality.category = req.body.category;
+    }
+    if (req.body.description != null) {
+      actuality.description = req.body.description;
+    }
+    if (req.body.file != null) {
+      actuality.file = req.body.file.path
+    }
+
+    const updated =  await Actuality.findByIdAndUpdate(id,actuality);
+    res.json(updated);
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+};
 
 module.exports = {
-  createActuality,
+   createActuality,
   getAllActualities,
   getOne,
-  deleteActuality
-};
+  deleteActuality,
+  updateActuality
+ };

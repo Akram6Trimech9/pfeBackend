@@ -13,5 +13,7 @@ var messageSchema = new mongoose.Schema({
         type:String,
         required:false
       }
+},{
+  timestamps:true
 })
 module.exports = mongoose.model('Message', messageSchema);

@@ -94,8 +94,9 @@ const acceptRdv = asyncHandler(async (req, res) => {
     const path = "templates/rdv-created.html" ;
      await sendEmailWithAttachments(rdv.user.email ,'akramtrimech97@gmail.com','Rendez vous Accepted ', path ,null,"resetURL" )
     const notification = new Notification({
-        message: "Le rendez-vous a été confirmé",
-        user: rdv.user._id
+        message: "votre rendez-vous a été confirmé",
+        user: rdv.user._id,
+        rdv:rdv
     });
     notification.save().then(notification_created => {
         if(notification_created){

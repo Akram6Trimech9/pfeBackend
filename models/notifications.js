@@ -9,5 +9,9 @@ var notifSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
       }, 
+      rdv:      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Rdv',
+      }, 
 })
 module.exports = mongoose.model('Notifications', notifSchema);

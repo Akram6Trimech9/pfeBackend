@@ -6,6 +6,9 @@ const messageController = require('../controller/messageController');
 
  router.get('/:id', messageController.getMessageByIdUser);
 
+
+ router.get('/email/:email', messageController.getMessgaeByEmail);
+
  router.delete('/:id', messageController.deleteMessage);
 
 module.exports = router;

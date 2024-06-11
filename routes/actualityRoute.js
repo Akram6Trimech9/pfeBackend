@@ -18,5 +18,6 @@ const upload = multer({ storage: storage });
 router.get('/', actualityController.getAllActualities);
 router.get('/:id', actualityController.getOne);
 router.delete('/:id', actualityController.deleteActuality);
+router.patch('/:id',upload.single('file'),  actualityController.updateActuality);
 
 module.exports = router;
