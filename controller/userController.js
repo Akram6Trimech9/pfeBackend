@@ -225,7 +225,7 @@ const sendVerificationLink = asyncHandler(async (req, res) => {
 
       const path = "templates/validate-account.html";
       const resetURL = `${process.env.VERIFICATION_LINK}/${verificationToken}`;
-      await sendEmailWithAttachments(user.email, 'akramtrimech97@gmail.com', 'Verification Link', path, null, resetURL);
+      await sendEmailWithAttachments(user.email, 'karyym02@gmail.com', 'Verification Link', path, null, resetURL);
       
       res.json({ message: 'Verification link sent successfully' });
   } catch (error) {
@@ -325,7 +325,7 @@ const updatePassword = asyncHandler(async (req,res )=> {
    const path = "templates/reset-password.html" ;
    const  resetURL= `${process.env.RESET_LINK}${token}`
    console.log(email)
-   await sendEmailWithAttachments(email ,'akramtrimech97@gmail.com','reset password link ', path ,null,resetURL )
+   await sendEmailWithAttachments(email ,'karyym02@gmail.com','reset password link ', path ,null,resetURL )
   res.json(token) 
   }catch(error){ 
        throw new Error(error)
